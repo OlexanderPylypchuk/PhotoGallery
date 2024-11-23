@@ -1,4 +1,6 @@
-﻿namespace PhotoGallery.API.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace PhotoGallery.API.Models
 {
 	public class Photo
 	{
@@ -7,6 +9,8 @@
 		public string Description { get; set; }
 		public string ImgUrl { get; set; }
 		public string ImageLocalPath { get; set; }
+		[ForeignKey("AppUser")]
 		public string UserId { get; set; }
+		public AppUser AppUser { get; set; }
 	}
 }

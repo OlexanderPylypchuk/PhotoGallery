@@ -9,6 +9,7 @@ using PhotoGallery.API.Models;
 using PhotoGallery.API.Repository;
 using PhotoGallery.API.Service.IService;
 using PhotoGallery.API.Service;
+using PhotoGallery.API.Repository.IRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,7 +59,9 @@ builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("ApiSett
 
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -70,6 +73,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
