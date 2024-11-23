@@ -29,6 +29,7 @@ namespace PhotoGallery.API.Controllers
 
 				if (!result)
 				{
+					_responceDto.Success = false;
 					_responceDto.Message = "Untraced error";
 					return _responceDto;
 				}
