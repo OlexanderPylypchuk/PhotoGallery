@@ -52,6 +52,15 @@ builder.Services.AddSwaggerGen(options =>
 		}
 	});
 });
+builder.Services.AddCors(options =>
+{
+	options.AddDefaultPolicy(policy =>
+					  {
+						  policy.WithOrigins("http://localhost:5173");
+						  policy.AllowAnyHeader();
+						  policy.AllowAnyMethod();
+					  });
+});
 
 IMapper mapper = MapperConfig.RegisterMaps().CreateMapper();
 builder.Services.AddSingleton(mapper);
@@ -100,7 +109,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors();
 app.MapControllers();
 ApplyMigrations();
 app.Run();
