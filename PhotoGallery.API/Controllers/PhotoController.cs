@@ -72,11 +72,12 @@ namespace PhotoGallery.API.Controllers
 
 		[HttpPost]
 		[Route("create")]
+		[Authorize]
 		public async Task<ResponceDto> Create(PhotoDto photoDto)
 		{
 			try
 			{
-				string userId = User.Claims.FirstOrDefault(u => u.Type == SD.IdClaimName)?.Value;
+				string userId = HttpContext.User.Claims.FirstOrDefault(u => u.Type == SD.IdClaimName).Value;
 
 				if (photoDto.Photo != null)
 				{
@@ -84,9 +85,7 @@ namespace PhotoGallery.API.Controllers
 					photo.Id = 0;
 					photo.UserId = userId;
 
-					await _unitOfWork.PhotoRepository.CreateAsync(photo);
-
-					string fileName = photo.Id + Path.GetExtension(photoDto.Photo.FileName);
+					string fileName = Guid.NewGuid() + Path.GetExtension(photoDto.Photo.FileName);
 					string filePath = @"wwwroot\images\" + fileName;
 
 					var filePathDirectory = Path.Combine(Directory.GetCurrentDirectory(), filePath);
@@ -97,8 +96,11 @@ namespace PhotoGallery.API.Controllers
 					}
 
 					var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+
 					photo.ImgUrl = baseUrl + "/images/" + fileName;
 					photo.ImageLocalPath = filePath;
+
+					await _unitOfWork.PhotoRepository.CreateAsync(photo);
 
 					_responceDto.Success = true;
 					_responceDto.Result = _mapper.Map<PhotoDto>(photo);
@@ -124,6 +126,7 @@ namespace PhotoGallery.API.Controllers
 			try
 			{
 				string userId = User.Claims.FirstOrDefault(u => u.Type == SD.IdClaimName)?.Value;
+
 				if (userId != photoDto.UserId)
 				{
 					throw new Exception("User Id does not match");
@@ -133,7 +136,7 @@ namespace PhotoGallery.API.Controllers
 
 				if (photoDto.Photo != null)
 				{
-					string fileName = photoDto.Id + Path.GetExtension(photoDto.Photo.FileName);
+					string fileName = Guid.NewGuid() + Path.GetExtension(photoDto.Photo.FileName);
 					string filePath = @"wwwroot\images\" + fileName;
 
 					if (!string.IsNullOrEmpty(photo.ImageLocalPath))

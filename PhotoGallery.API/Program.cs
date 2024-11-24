@@ -10,6 +10,8 @@ using PhotoGallery.API.Repository;
 using PhotoGallery.API.Service.IService;
 using PhotoGallery.API.Service;
 using PhotoGallery.API.Repository.IRepository;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,7 +63,30 @@ builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+var secret = builder.Configuration.GetValue<string>("ApiSettings:JwtOptions:Key");
+var issuer = builder.Configuration.GetValue<string>("ApiSettings:JwtOptions:Issuer");
+var audience = builder.Configuration.GetValue<string>("ApiSettings:JwtOptions:Audience");
+
+var key = Encoding.ASCII.GetBytes(secret);
+
+builder.Services.AddAuthentication(options =>
+{
+	options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+	x.TokenValidationParameters = new()
+	{
+		ValidateIssuerSigningKey = true,
+		IssuerSigningKey = new SymmetricSecurityKey(key),
+		ValidateIssuer = true,
+		ValidIssuer = issuer,
+		ValidateAudience = true,
+		ValidAudience = audience
+	};
+});
 builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

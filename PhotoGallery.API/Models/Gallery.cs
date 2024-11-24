@@ -10,7 +10,6 @@ namespace PhotoGallery.API.Models
 		[ForeignKey("AppUser")]
 		public string UserId { get; set; }
 		public AppUser AppUser { get; set; }
-		[NotMapped]
 		public List<PhotoInGallery> Photos { get; set; }
 	}
 }

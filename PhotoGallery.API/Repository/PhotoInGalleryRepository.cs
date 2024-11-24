@@ -1,4 +1,5 @@
-﻿using PhotoGallery.API.Data;
+﻿using System.Runtime.CompilerServices;
+using PhotoGallery.API.Data;
 using PhotoGallery.API.Models;
 using PhotoGallery.API.Repository.IRepository;
 

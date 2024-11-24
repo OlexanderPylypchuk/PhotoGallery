@@ -1,4 +1,5 @@
-﻿using PhotoGallery.API.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using PhotoGallery.API.Data;
 using PhotoGallery.API.Models;
 using PhotoGallery.API.Repository.IRepository;
 
@@ -15,6 +16,10 @@ namespace PhotoGallery.API.Repository
 
         public async Task Update(Gallery gallery)
 		{
+			var list = _db.PhotoInGallery.Where(x => x.GalleryId == gallery.Id);
+
+			_db.RemoveRange(list);
+
 			_db.Galleries.Update(gallery);
 			await _db.SaveChangesAsync();
 		}
