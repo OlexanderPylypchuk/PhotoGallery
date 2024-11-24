@@ -53,6 +53,31 @@ namespace PhotoGallery.API.Controllers
 			return _responceDto;
 		}
 
+		[HttpGet("{name}")]
+		public async Task<ResponceDto> Get(string title)
+		{
+			try
+			{
+				var gallery = await _unitOfWork.GalleryRepository.GetAsync(u => u.Name == title, includeProperties: "Photos");
+
+				if (gallery == null)
+				{
+					throw new Exception("Failed to find gallery");
+				}
+
+				await GetPhotos(gallery);
+
+				_responceDto.Success = true;
+				_responceDto.Result = gallery;
+			}
+			catch (Exception ex)
+			{
+				_responceDto.Success = false;
+				_responceDto.Message = ex.Message;
+			}
+			return _responceDto;
+		}
+
 		[HttpGet]
 		public async Task<ResponceDto> GetAll([FromQuery] int pageSize = 5, int pageNumber = 1)
 		{
