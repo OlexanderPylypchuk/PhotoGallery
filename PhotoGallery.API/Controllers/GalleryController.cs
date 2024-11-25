@@ -54,14 +54,33 @@ namespace PhotoGallery.API.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ResponceDto> GetAll([FromQuery] int pageSize = 5, int pageNumber = 1)
+		public async Task<ResponceDto> GetAll([FromQuery] int pageSize = 5, int pageNumber = 1, bool userGalleries = false)
 		{
 			try
 			{
-				var galleries = _unitOfWork.GalleryRepository.GetAllAsync(pageSize: pageSize, pageNumber: pageNumber, includeProperties: "Photos")
+				List<Gallery> galleries;
+
+				if (userGalleries)
+				{
+					var userId = HttpContext.User.Claims.FirstOrDefault(u => u.Type == SD.IdClaimName).Value;
+
+					if(userId == null)
+					{
+						throw new Exception("Unauthorized");
+					}
+
+					galleries = _unitOfWork.GalleryRepository.GetAllAsync(u => u.UserId == userId,pageSize: pageSize, pageNumber: pageNumber, includeProperties: "Photos")
 					.GetAwaiter()
 					.GetResult()
 					.ToList();
+				}
+				else
+				{
+					galleries = _unitOfWork.GalleryRepository.GetAllAsync(pageSize: pageSize, pageNumber: pageNumber, includeProperties: "Photos")
+					.GetAwaiter()
+					.GetResult()
+					.ToList();
+				}
 
 				if (galleries == null)
 				{

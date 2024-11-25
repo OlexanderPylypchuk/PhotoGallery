@@ -65,7 +65,6 @@ namespace PhotoGallery.API.Service
 
 		public async Task<bool> Register(RegistrationRequestDto registrationRequest)
 		{
-
 			try
 			{
 				AppUser appUser = new()
